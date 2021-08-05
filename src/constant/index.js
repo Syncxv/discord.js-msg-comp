@@ -1,0 +1,7 @@
+const createEnum = require('../util/enum')
+
+module.exports = {
+    INTERACTION_CALLBACK_TYPE: createEnum([null, "PONG", "CHANNEL_MESSAGE_WITH_SOURCE", "DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE", "DEFERRED_UPDATE_MESSAGE", "UPDATE_MESSAGE"]),
+    MESSAGE_COMPONENT_TYPE: createEnum([null, "ACTION_ROW", "BUTTON", "SELECT_MENU"]),
+    MESSAGE_BUTTON_STYLES: createEnum([null, "PRIMARY", "SECONDARY", "SUCCESS", "DANGER", "LINK"]),
+}
