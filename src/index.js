@@ -1,8 +1,24 @@
-const { Client, Intents } = require('discord.js');
+const { Client, Intents, Collection } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 require('dotenv').config();
 const token = process.env['token']
 const { MESSAGE_COMPONENT_TYPE, INTERACTION_CALLBACK_TYPE, MESSAGE_BUTTON_STYLES } = require('./constant')
+client.commands = new Collection();
+client.aliases = new Collection();
+const commands = require('./commands');
+(() => {
+  Object.values(commands).forEach(command => {
+    client.commands.set(command.name, command);
+    if (command.aliases) {
+        for (const alias of command.aliases) {
+          client.aliases.set(alias, command.name);
+        }
+    }
+})
+})()
+
+
+const prefix = "+"
 const gid = "747955932834693273"
 const getApp = (guildId) => guildId ? client.api.applications(client.user.id).guilds(guildId)  : client.api.applications(client.user.id)
 const postContent =  (e, content) => client.api.interactions(e.id, e.token,).callback.post({data: {type: 4, data: {content: content}}})
@@ -34,7 +50,6 @@ client.on('ready', () => {
 });
 
 client.on('messageCreate', message => {
-    console.log("PLEASE")
   if (message.content === 'ping') {
     message.channel.send({
       content: "BUTTON 1",
@@ -116,6 +131,22 @@ client.on('messageCreate', message => {
           }
       ]
   })
+  }
+  if(!message.content.startsWith(prefix)) return
+  const messageSplit = message.content.split(/\s+/g);
+  const cmd = messageSplit[0].slice(prefix.length);
+  const args = messageSplit.slice(1);
+  try {
+    let command;
+    if (client.commands.has(cmd)) {
+      command = client.commands.get(cmd);
+    } else if (client.aliases.has(cmd)) {
+      command = client.commands.get(client.aliases.get(cmd));
+    }
+    if (!command) return;
+    command.execute(client, message, args);
+  } catch (err) {
+    console.error(err);
   }
 });
 
