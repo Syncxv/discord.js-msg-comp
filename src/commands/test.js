@@ -1,23 +1,12 @@
+const { MESSAGE_COMPONENT_TYPE, MESSAGE_BUTTON_STYLES } = require('../constant')
+const {createButton, createComponent} = require('../util')
 module.exports = {
     name: "bruh",
     description: 'A test',
-    execute: (client, message, args) => {
+    execute: (client, message, [name]) => {
         message.channel.send({
             content: "hehe",
-            components: [
-                {
-                    "type": 1,
-                    "components": [
-                        {
-                            "type": 2,
-                            "label": "Button 2",
-                            "style": 1,
-                            "custom_id": "btn2"
-                        }
-                    ]
-        
-                }
-            ]
+            components: createComponent(createButton("id_test", name || "hehehe", MESSAGE_BUTTON_STYLES.DANGER))
         });
     }
 }

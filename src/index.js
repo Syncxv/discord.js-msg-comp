@@ -1,8 +1,9 @@
 const { Client, Intents, Collection } = require('discord.js');
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES] });
 require('dotenv').config();
 const token = process.env['token']
 const { MESSAGE_COMPONENT_TYPE, INTERACTION_CALLBACK_TYPE, MESSAGE_BUTTON_STYLES } = require('./constant')
+const createButton = require('./util/createButton')
 client.commands = new Collection();
 client.aliases = new Collection();
 const commands = require('./commands');
@@ -107,24 +108,9 @@ client.on('messageCreate', message => {
           {
               "type": 1,
               "components": [
-                  {
-                      "type": 2,
-                      "label": "Button 1",
-                      "style": MESSAGE_BUTTON_STYLES.DANGER,
-                      "custom_id": "btn1"
-                  },
-                  {
-                    "type": 2,
-                    "label": "Button 2",
-                    "style": 1,
-                    "custom_id": "btn2"
-                  },
-                  {
-                    "type": 2,
-                    "label": "hhehe",
-                    "style": 1,
-                    "custom_id": "other btn"
-                  }
+                  createButton("btn1", "BUTT 1",),
+                  createButton("btn2", "bUTTon OF the 2"),
+                  createButton("burh", "WOAH", MESSAGE_BUTTON_STYLES.DANGER)
                 
               ]
   
