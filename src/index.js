@@ -22,7 +22,7 @@ client.on('ready', () => {
             postContent(e, {content: `${e.data.values.join(", ")}`})
             break
         default:
-          postContent(e, "welp") 
+          postContent(e, {content: "welp"}) 
           
       }
     }
