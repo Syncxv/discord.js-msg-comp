@@ -7,6 +7,7 @@ const createButton = require('./util/createButton')
 client.commands = new Collection();
 client.aliases = new Collection();
 const commands = require('./commands');
+const createEmebed = require('./util/createEmbed');
 (() => {
   Object.values(commands).forEach(command => {
     client.commands.set(command.name, command);
@@ -18,12 +19,24 @@ const commands = require('./commands');
 })
 })()
 
-
+var test = Object.values(commands)
+      for (let i = 0; i < 10; i++) {
+          test.push({
+              name: "cmd"+i,
+              description: "A REALLY NICE DESCRIPTION hehe"
+          })
+      }
+      global.test = test
+      let arr = []
+      for (let i = 0; i < Math.floor(test.length / 5)+3; ++i) {
+          arr.push(test.splice(-5))
+      }
+const pageCount = arr.length
 const prefix = "+"
 const gid = "747955932834693273"
 const getApp = (guildId) => guildId ? client.api.applications(client.user.id).guilds(guildId)  : client.api.applications(client.user.id)
 const postContent =  (e, content) => client.api.interactions(e.id, e.token,).callback.post({data: {type: 4, data: {content: content}}})
-const postData = (e, options = {type: 4}) => {
+const postData = (e, options = {type: 6}) => {
   client.api.interactions(e.id, e.token,).callback.post({data: {type: options.type, data: options.data}})
 }
 client.on('ready', () => {
@@ -32,12 +45,21 @@ client.on('ready', () => {
   client.ws.on("INTERACTION_CREATE", async (e) => {
     console.log(e)
     if(e.data.custom_id) {
+      // var mor = "**[dig](https://dankmemer.lol/commands)** \n<:Reply:870665583593660476>Dig in the dirt for coins and items!\n*"
       switch(e.data.custom_id) {
-        case "btn1":
-            postContent(e, "button 1")
+        case "next":
+          var currPage = parseInt(e.message.embeds[0].footer.text.split(' ')[1]) - 1
+          console.log(currPage)
+          console.log(arr)
+          if (currPage >= pageCount) return postData(e,{type: 6,})
+          postData(e, {type: 7, data: {embeds: createEmebed(null, arr[currPage + 1].map(command => `**[${command.name}](https://www.google.com)** \n :round_pushpin: ${command.description}\n`).join('\n'), "Page " + (currPage + 2))}})
+          // postData(e, {type: 7, data: {content: "Page " + (currPage + 1)}})
             break
-        case "btn2":
-          postData(e, {type: 7, data: {content: "WELP"}})
+        case "prev":
+          var currPage = parseInt(e.message.embeds[0].footer.text.split(' ')[1]) - 1
+          console.log(currPage)
+          if ((currPage) === 1) return postData(e,{type: 6,})
+          postData(e, {type: 7, data: {embeds: createEmebed(null, arr[currPage].map(command => `**[${command.name}](https://www.google.com)** \n :round_pushpin: ${command.description}\n`).join('\n'), "Page " + (currPage - 1))}})
             break
         case "select":
             postContent(e, `welp: ${e.data.values.join(", ")}`)
@@ -118,6 +140,21 @@ client.on('messageCreate', message => {
       ]
   })
   }
+  if (message.content === "bruuuh") {
+    message.channel.send({
+      content: "Page 1",
+      components: [
+        {
+          type: MESSAGE_COMPONENT_TYPE.ACTION_ROW,
+          components: [
+            createButton("prev", "Previous",),
+            createButton("burh", "WOAH", MESSAGE_BUTTON_STYLES.DANGER),
+            createButton("next", "NEXT"),
+          ]
+        }
+      ]
+    })
+  }
   if(!message.content.startsWith(prefix)) return
   const messageSplit = message.content.split(/\s+/g);
   const cmd = messageSplit[0].slice(prefix.length);
@@ -130,6 +167,7 @@ client.on('messageCreate', message => {
       command = client.commands.get(client.aliases.get(cmd));
     }
     if (!command) return;
+    if(command.name == "help") return command.execute(client, message, args, createEmebed(null, arr[0].map(command => `**[${command.name}](https://www.google.com)** \n :round_pushpin: ${command.description}\n`).join('\n'), "Page 1"));
     command.execute(client, message, args);
   } catch (err) {
     console.error(err);
