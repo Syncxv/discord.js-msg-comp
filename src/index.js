@@ -4,7 +4,7 @@ require('dotenv').config();
 const token = process.env['token']
 const gid = "747955932834693273"
 const getApp = (guildId) => guildId ? client.api.applications(client.user.id).guilds(guildId)  : client.api.applications(client.user.id)
-const postContent =  (e, data) => client.api.interactions(e.id, e.token,).callback.post({data: {type: 4, data: data}})
+const postContent =  (e, content) => client.api.interactions(e.id, e.token,).callback.post({data: {type: 4, data: {content: content}}})
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
   const commands = getApp(gid).commands.get()
@@ -13,16 +13,16 @@ client.on('ready', () => {
     if(e.data.custom_id) {
       switch(e.data.custom_id) {
         case "btn1":
-            postContent(e, {contenet: "button 1"})
+            postContent(e, "button 1")
             break
         case "btn2":
-            postContent(e, {content: "button 2"})
+            postContent(e, "button 2")
             break
         case "select":
-            postContent(e, {content: `${e.data.values.join(", ")}`})
+            postContent(e, `welp: ${e.data.values.join(", ")}`)
             break
         default:
-          postContent(e, {content: "welp"}) 
+          postContent(e, "welp") 
           
       }
     }
